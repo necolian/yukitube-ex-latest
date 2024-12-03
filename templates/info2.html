@@ -29,8 +29,11 @@
             <div class="pure-g h-box">
                 <div class="pure-u-2-3">
 
-                    <!-- ここにコンテンツ -->
-                      
+                    <h3>情報 - 現在のapiサーバー</h3><br>
+                    <p>Youtube-API:{{Youtube_API}}</p><br>
+                    <p>Channel-API:{{Channel_API}}</p><br>
+                    <p>Comments-API:{{Comments_API}}</p><br>
+                    
                 </div>
                 
             </div>      
@@ -49,6 +52,8 @@
     function reload() {
         location.reload();
     }
+
+    setTimeout(function (){location.reload();},5000)
     </script>
 </body>
 </html>
