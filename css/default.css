@@ -195,7 +195,7 @@ img.thumbnail {
 .searchbar .pure-form fieldset { padding: 0; }
 
 .searchbar input[type="search"] {
-	width: 100%;
+	width: 70%;
 	margin: 1px;
 
 	border: 1px solid;
