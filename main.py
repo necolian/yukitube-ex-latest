@@ -266,10 +266,10 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
 
     except HTTPException as e:
         # HTTP例外としてハンドリング
-        return HTMLResponse(content=f"<h1>Error {e.status_code}</h1><p>{e.detail}</p>", status_code=e.status_code)
+        return APItimeoutError()
     except Exception as e:
         # 他の予期しない例外を処理
-        return HTMLResponse(content=f"<h1>Unexpected Error</h1><p>{str(e)}</p>", status_code=500)
+        return APItimeoutError()
 
 @app.get("/hashtag/{tag}")
 def search(tag:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None)):
