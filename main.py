@@ -105,28 +105,63 @@ def get_data(videoid):
         return "error"
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
-def get_search(q,page):
+def get_search(q, page):
     global logs
-    t = json.loads(apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp"))
-    def load_search(i):
-        if i["type"] == "video":
-            return {"title":i["title"],"id":i["videoId"],"authorId":i["authorId"],"author":i["author"],"length":str(datetime.timedelta(seconds=i["lengthSeconds"])),"published":i["publishedText"],"type":"video"}
-        elif i["type"] == "playlist":
-            if not i["videos"]:
-                raise ValueError("video search api error")
-            return {"title":i["title"],"id":i["playlistId"],"thumbnail":i["videos"][0]["videoId"],"count":i["videoCount"],"type":"playlist"}
-        else:
-            if i["authorThumbnails"][-1]["url"].startswith("https"):
-                return {"author":i["author"],"id":i["authorId"],"thumbnail":i["authorThumbnails"][-1]["url"],"type":"channel"}
-            else:
-                return {"author":i["author"],"id":i["authorId"],"thumbnail":r"https://"+i["authorThumbnails"][-1]["url"],"type":"channel"}
-    
     try:
-        hogehoge = [load_search(i) for i in t]
-    except ValueError as error:
-        hogehoge = error
-    return hogehoge
-    
+        response = apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp")
+        t = json.loads(response)
+
+        results = []
+        for item in t:
+            try:
+                results.append(load_search(item))
+            except ValueError as ve:
+                # エラー詳細をログに記録して、処理を続ける
+                logs.append(f"Error processing item: {str(ve)}")
+                continue  # エラーが発生した場合、そのアイテムをスキップ
+
+        return results
+
+    except json.JSONDecodeError:
+        raise ValueError("Failed to decode JSON response.")
+    except Exception as e:
+        logs.append(f"API request error: {str(e)}")
+        return {"error": "API request error."}
+
+def load_search(i):
+    if i["type"] == "video":
+        return {
+            "title": i["title"],
+            "id": i["videoId"],
+            "authorId": i["authorId"],
+            "author": i["author"],
+            "length": str(datetime.timedelta(seconds=i["lengthSeconds"])),
+            "published": i["publishedText"],
+            "type": "video"
+        }
+    elif i["type"] == "playlist":
+        if not i["videos"]:
+            raise ValueError("Playlist is empty.")
+        return {
+            "title": i["title"],
+            "id": i["playlistId"],
+            "thumbnail": i["videos"][0]["videoId"],
+            "count": i["videoCount"],
+            "type": "playlist"
+        }
+    else:  # type = "channel" またはその他
+        thumbnail_url = (
+            i["authorThumbnails"][-1]["url"]
+            if i["authorThumbnails"][-1]["url"].startswith("https")
+            else "https://" + i["authorThumbnails"][-1]["url"]
+        )
+        return {
+            "author": i["author"],
+            "id": i["authorId"],
+            "thumbnail": thumbnail_url,
+            "type": "channel"
+        }
+        
 def get_channel(channelid):
     global apichannels
     t = json.loads(apichannelrequest(r"api/v1/channels/"+ urllib.parse.quote(channelid)))
