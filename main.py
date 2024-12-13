@@ -211,15 +211,30 @@ def video(v:str,response: Response,request: Request,yuki: Union[str] = Cookie(No
     response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
     return template('video.html', {"request": request,"videoid":videoid,"videourls":t[1],"res":t[0],"description":t[2],"videotitle":t[3],"authorid":t[4],"authoricon":t[6],"author":t[5],"proxy":proxy})
 
-@app.get("/search", response_class=HTMLResponse,)
-def search(q:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None),proxy: Union[str] = Cookie(None)):
-    if not(check_cokie(yuki)):
+@app.get("/search", response_class=HTMLResponse)
+def search(q: str, response: Response, request: Request, page: Union[int, None] = 1, yuki: Union[str] = Cookie(None), proxy: Union[str] = Cookie(None)):
+    # クッキーの検証
+    if not check_cokie(yuki):
         return redirect("/")
-    response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
-    results = get_search(q,page)
-    if isinstance(results, dict) and "error" in results:
-        return HTTPException(status_code=500, detail="Invidious video api error")
-    return template("search.html", {"request": request,"results":results,"word":q,"next":f"/search?q={q}&page={page + 1}","proxy":proxy})
+    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
+
+    try:
+        results = get_search(q, page)
+
+        # resultsがdict型かつerrorキーを含む場合の処理
+        if isinstance(results, dict) and "error" in results:
+            error_detail = results.get("error", "Unknown error occurred.")
+            raise HTTPException(status_code=500, detail=f"Search API error: {error_detail}")
+
+        # 検索成功時のテンプレスキーマに結果を渡す
+        return template("search.html", {"request": request, "results": results, "word": q, "next": f"/search?q={q}&page={page + 1}", "proxy": proxy})
+
+    except HTTPException as e:
+        # HTTP例外としてハンドリング
+        return HTMLResponse(content=f"<h1>Error {e.status_code}</h1><p>{e.detail}</p>", status_code=e.status_code)
+    except Exception as e:
+        # 他の予期しない例外を処理
+        return HTMLResponse(content=f"<h1>Unexpected Error</h1><p>{str(e)}</p>", status_code=500)
 
 @app.get("/hashtag/{tag}")
 def search(tag:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None)):
