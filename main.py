@@ -108,19 +108,24 @@ def get_data(videoid):
 def get_search(q,page):
     global logs
     t = json.loads(apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp"))
-    if not i["videos"]:
-        return "video search api error"
     def load_search(i):
         if i["type"] == "video":
             return {"title":i["title"],"id":i["videoId"],"authorId":i["authorId"],"author":i["author"],"length":str(datetime.timedelta(seconds=i["lengthSeconds"])),"published":i["publishedText"],"type":"video"}
         elif i["type"] == "playlist":
+            if not i["videos"]:
+                raise ValueError("video search api error")
             return {"title":i["title"],"id":i["playlistId"],"thumbnail":i["videos"][0]["videoId"],"count":i["videoCount"],"type":"playlist"}
         else:
             if i["authorThumbnails"][-1]["url"].startswith("https"):
                 return {"author":i["author"],"id":i["authorId"],"thumbnail":i["authorThumbnails"][-1]["url"],"type":"channel"}
             else:
                 return {"author":i["author"],"id":i["authorId"],"thumbnail":r"https://"+i["authorThumbnails"][-1]["url"],"type":"channel"}
-    return [load_search(i) for i in t]
+    return [
+        try:
+            load_search(i) for i in t
+        except ValueError as e:
+            "error"
+    ]
 
 def get_channel(channelid):
     global apichannels
