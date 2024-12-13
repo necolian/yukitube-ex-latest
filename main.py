@@ -218,7 +218,7 @@ def search(q:str,response: Response,request: Request,page:Union[int,None]=1,yuki
     response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
     results = get_search(q,page)
     if results in "error":
-        return "video search api error"
+        raise ValueError("video search api error")
     return template("search.html", {"request": request,"results":results,"word":q,"next":f"/search?q={q}&page={page + 1}","proxy":proxy})
 
 @app.get("/hashtag/{tag}")
