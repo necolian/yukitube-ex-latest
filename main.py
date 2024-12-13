@@ -106,7 +106,7 @@ def get_data(videoid):
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
 def get_search(q, page):
-    global logs
+    global log2
     try:
         response = apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp")
         t = json.loads(response)
@@ -117,7 +117,7 @@ def get_search(q, page):
                 results.append(load_search(item))
             except ValueError as ve:
                 # エラー詳細をログに記録して、処理を続ける
-                logs.append(f"Error processing item: {str(ve)}")
+                log2.append(f"Error processing item: {str(ve)}")
                 continue  # エラーが発生した場合、そのアイテムをスキップ
 
         return results
@@ -125,7 +125,7 @@ def get_search(q, page):
     except json.JSONDecodeError:
         raise ValueError("Failed to decode JSON response.")
     except Exception as e:
-        logs.append(f"API request error: {str(e)}")
+        log2.append(f"API request error: {str(e)}")
         return {"error": "API request error."}
 
 def load_search(i):
