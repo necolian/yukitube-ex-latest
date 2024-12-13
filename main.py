@@ -120,13 +120,13 @@ def get_search(q,page):
                 return {"author":i["author"],"id":i["authorId"],"thumbnail":i["authorThumbnails"][-1]["url"],"type":"channel"}
             else:
                 return {"author":i["author"],"id":i["authorId"],"thumbnail":r"https://"+i["authorThumbnails"][-1]["url"],"type":"channel"}
-    return [
-        try:
-            load_search(i) for i in t
-        except ValueError as e:
-            "error"
-    ]
-
+    
+    try:
+        hogehoge = [load_search(i) for i in t]
+    except ValueError as error:
+        hogehoge = error
+    return hogehoge
+    
 def get_channel(channelid):
     global apichannels
     t = json.loads(apichannelrequest(r"api/v1/channels/"+ urllib.parse.quote(channelid)))
