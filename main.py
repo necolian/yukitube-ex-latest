@@ -168,7 +168,7 @@ def check_cokie(cookie):
 
 
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi import Response,Cookie,Request
 from fastapi.responses import HTMLResponse,PlainTextResponse
 from fastapi.responses import RedirectResponse as redirect
@@ -218,7 +218,7 @@ def search(q:str,response: Response,request: Request,page:Union[int,None]=1,yuki
     response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
     results = get_search(q,page)
     if isinstance(results, dict) and "error" in results:
-        return raise ValueError("video search api error")
+        return HTTPException(status_code=500, detail="Invidious video api error")
     return template("search.html", {"request": request,"results":results,"word":q,"next":f"/search?q={q}&page={page + 1}","proxy":proxy})
 
 @app.get("/hashtag/{tag}")
