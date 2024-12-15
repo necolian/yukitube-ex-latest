@@ -257,7 +257,7 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
         results = get_search(q, page)
 
         # resultsがdict型かつerrorキーを含む場合の処理
-        if isinstance(results, dict) and "error" in results:
+        if isinstance(results, dict):
             error_detail = results.get("error", "Unknown error occurred.")
             raise HTTPException(status_code=500, detail=f"Search API error: {error_detail}")
 
