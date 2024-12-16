@@ -33,7 +33,7 @@
             </div>
             <div class="pure-u-1-4"></div>
             <div class="pure-u-1 pure-u-md-12-24 searchbar">
-                <form class="pure-form" action="/search" method="get">
+                <form id="searchForm" class="pure-form" action="/search" method="get">
                     <fieldset>
                         <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" autofocus="" name="q" placeholder="検索" title="検索" value="">
                     </fieldset>
@@ -50,9 +50,18 @@
             xhr.open("GET", url);
             xhr.onload = function() {
                 response(JSON.parse(xhr.responseText));
-            }
+                }
             xhr.send();
-        }},delay:300});</script>
+            }},
+    　　　　　select: function(event, ui) {
+                    // 候補が選択されたときの処理
+                    // テキストボックスに選択したアイテムをセット
+                    $("#searchbox").val(ui.item.value);
+                    // フォームを送信
+                    $("#searchForm").submit(); // フォームを送信
+                    return false; // jQuery UIのデフォルトの動作をキャンセル
+                }
+    　　　　　delay:300});</script>
     </body>
 
 </html>
