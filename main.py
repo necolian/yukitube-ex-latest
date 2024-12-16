@@ -261,7 +261,7 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
             print(True)
             error_detail = results.get("error", "Unknown error occurred.")
             raise HTTPException(status_code=500, detail=f"Search API error: {error_detail}")
-            break
+            return template("APIwait.html",{"request": request},status_code=500)
 
         # 検索成功時のテンプレスキーマに結果を渡す
         return template("search.html", {"request": request, "results": results, "word": q, "next": f"/search?q={q}&page={page + 1}", "proxy": proxy})
