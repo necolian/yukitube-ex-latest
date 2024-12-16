@@ -254,11 +254,9 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
 
     try:
         results = get_search(q, page)
-        print(isinstance(results, dict))
 
         # resultsがdict型の場合の処理
         if isinstance(results, dict):
-            print(True)
             error_detail = results.get("error", "Unknown error occurred.")
             raise HTTPException(status_code=500, detail=f"Search API error: {error_detail}")
             return template("APIwait.html",{"request": request},status_code=500)
@@ -268,10 +266,10 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
 
     except HTTPException as e:
         # HTTP例外としてハンドリング
-        return APItimeoutError()
+        raise e
     except Exception as e:
         # 他の予期しない例外を処理
-        return APItimeoutError()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/hashtag/{tag}")
 def search(tag:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None)):
