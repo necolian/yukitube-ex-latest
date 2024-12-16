@@ -119,7 +119,6 @@ def get_search(q, page):
                 # エラー詳細をログに記録して、処理を続ける
                 log2.append(f"Error processing item: {str(ve)}")
                 continue  # エラーが発生した場合、そのアイテムをスキップ
-
         return results
 
     except json.JSONDecodeError:
@@ -255,7 +254,7 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
 
     try:
         results = get_search(q, page)
-        print(results)
+        print(isinstance(results, dict))
 
         # resultsがdict型の場合の処理
         if isinstance(results, dict):
