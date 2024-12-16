@@ -106,7 +106,7 @@ def get_data(videoid):
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
 def get_search(q, page):
-    global errorlog
+    errorlog = ""
     try:
         response = apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp")
         t = json.loads(response)
