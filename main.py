@@ -256,10 +256,12 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
     try:
         results = get_search(q, page)
 
-        # resultsがdict型かつerrorキーを含む場合の処理
+        # resultsがdict型の場合の処理
         if isinstance(results, dict):
+            print(True)
             error_detail = results.get("error", "Unknown error occurred.")
             raise HTTPException(status_code=500, detail=f"Search API error: {error_detail}")
+            break
 
         # 検索成功時のテンプレスキーマに結果を渡す
         return template("search.html", {"request": request, "results": results, "word": q, "next": f"/search?q={q}&page={page + 1}", "proxy": proxy})
