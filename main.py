@@ -255,6 +255,7 @@ def search(q: str, response: Response, request: Request, page: Union[int, None] 
 
     try:
         results = get_search(q, page)
+        print(results)
 
         # resultsがdict型の場合の処理
         if isinstance(results, dict):
