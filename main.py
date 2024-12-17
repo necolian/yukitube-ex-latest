@@ -5,7 +5,9 @@ import time
 import datetime
 import random
 import os
+import magic
 from cache import cache
+
 
 max_api_wait_time = 3
 max_time = 10
@@ -101,7 +103,7 @@ def get_data(videoid):
     global logs
     t = json.loads(apirequest(r"api/v1/videos/"+ urllib.parse.quote(videoid)))
     res = requests.get(t["formatStreams"][0]["url"])
-    if (res == ""):
+    if (res):
         return "error"
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
@@ -241,7 +243,7 @@ def video(v:str,response: Response,request: Request,yuki: Union[str] = Cookie(No
     videoid = v
     t = get_data(videoid)
     if (t == "error"):
-            return template("404.html",{"request": request,"status_code":"500 - VideoGettingError","message": "ビデオ取得エラー、再読み込みしてください。","home":False},status_code=400)
+            return template("error.html",{"request": request,"status_code":"502 - Bad Gateway","message": "ビデオ取得時のAPIエラー、再読み込みしてください。","home":False},status_code=502)
     response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
     return template('video.html', {"request": request,"videoid":videoid,"videourls":t[1],"res":t[0],"description":t[2],"videotitle":t[3],"authorid":t[4],"authoricon":t[6],"author":t[5],"proxy":proxy})
 
@@ -363,7 +365,7 @@ def home():
 
 @app.exception_handler(404)
 def notfounderror(request: Request,__):
-    return template("404.html",{"request": request,"status_code":"404 - NotFound","message":"未実装か、存在しないページです。","home":True},status_code=400)
+    return template("error.html",{"request": request,"status_code":"404 - NotFound","message":"未実装か、存在しないページです。","home":True},status_code=400)
 
 @app.exception_handler(500)
 def page(request: Request,__):
