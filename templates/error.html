@@ -39,8 +39,10 @@
 
                         {% if home %}
                         <a href="/">ホーム</a><br>
+                        <p>5秒後に自動的に遷移します</p>
                         {% else %}
                         <a onclick="reload()">再読み込み</a>
+                        <p>5秒後に自動的に再読み込みします</p>
                         {% endif %}
                     </div>
                 </div>
@@ -72,6 +74,14 @@
     function reload() {
         location.reload();
     }
+
+    settimeout(funtion(){
+        if ("{{ home }}" === True) {
+            window.location.href = "/";
+        }else{
+            reload();
+        }
+    },5*1000)
     </script>
 </body>
 </html>
