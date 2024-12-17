@@ -364,7 +364,11 @@ def home():
 
 @app.exception_handler(404)
 def notfounderror(request: Request,__):
-    return template("error.html",{"request": request,"status_code":"404 - NotFound","message":"未実装か、存在しないページです。","home":True},status_code=400)
+    return template("error.html",{"request": request,"status_code":"404 - Not Found","message":"未実装か、存在しないページです。","home":True},status_code=404)
+
+@app.exception_handler(504)
+def page(request: Request,__):
+    return template("error.html",{"request": request,"status_code":"504 - Gateway Timeout","message":"リクエストがタイムアウトしました","home":False},status_code=504)
 
 @app.exception_handler(500)
 def page(request: Request,__):
