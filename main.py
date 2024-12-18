@@ -101,6 +101,7 @@ def get_info(request):
 def get_data(videoid):
     global logs
     t = json.loads(apirequest(r"api/v1/videos/"+ urllib.parse.quote(videoid)))
+    print(t)
     res = requests.get(t["formatStreams"][0]["url"])
     print(t["formatStreams"][0]["url"])
     if not res.headers.get("Content-Type","").startswith("video"):
