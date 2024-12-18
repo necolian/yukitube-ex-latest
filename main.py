@@ -102,6 +102,8 @@ def get_data(videoid):
     global logs
     t = json.loads(apirequest(r"api/v1/videos/"+ urllib.parse.quote(videoid)))
     print(t)
+    if not t.get("formatStreams") or len(t["formatStreams"]) == 0:
+        return "error"
     res = [requests.get(t["formatStreams"][0]["url"]),requests.get(t["formatStreams"][1]["url"])]
     print([t["formatStreams"][0]["url"],t["formatStreams"][1]["url"]])
     if not res[0].headers.get("Content-Type","").startswith("video") or res[1].headers.get("Content-Type","").startswith("video"):
