@@ -1,4 +1,4 @@
-import json
+ import json
 import requests
 import urllib.parse
 import time
@@ -102,11 +102,11 @@ def get_data(videoid):
     global logs
     t = json.loads(apirequest(r"api/v1/videos/"+ urllib.parse.quote(videoid)))
     print(t)
-    res = requests.get(t["formatStreams"][0]["url"])
-    print(t["formatStreams"][0]["url"])
-    if not res.headers.get("Content-Type","").startswith("video"):
-        print(f"errorだよん:{res.headers.get("Content-Type","")}")
-        return "error"
+    res = [requests.get(t["formatStreams"][0]["url"]),requests.get(t["formatStreams"][1]["url"])]
+    print([t["formatStreams"][0]["url"],t["formatStreams"][1]["url"]])
+        if not res[0].headers.get("Content-Type","").startswith("video") or res[1].headers.get("Content-Type","").startswith("video"):
+            print(f"errorだよん:{res.headers.get("Content-Type","")}")
+            return "error"
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
 def get_search(q, page):
