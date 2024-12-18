@@ -103,10 +103,6 @@ def get_data(videoid):
     t = json.loads(apirequest(r"api/v1/videos/"+ urllib.parse.quote(videoid)))
     if not t.get("formatStreams") or len(t["formatStreams"]) == 0:
         return "error"
-    res = [requests.get(stream["url"]) for stream in t["formatStreams"] if "url" in stream]
-    print(res)
-    if all(not response.headers.get("Content-Type", "").startswith("video") for response in res):
-        return "error"
     return [{"id":i["videoId"],"title":i["title"],"authorId":i["authorId"],"author":i["author"]} for i in t["recommendedVideos"]],list(reversed([i["url"] for i in t["formatStreams"]]))[:2],t["descriptionHtml"].replace("\n","<br>"),t["title"],t["authorId"],t["author"],t["authorThumbnails"][-1]["url"]
 
 def get_search(q, page):
